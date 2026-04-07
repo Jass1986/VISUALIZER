@@ -537,12 +537,12 @@ audioInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Vercel request size is limited, so use smaller audio files for preview generation.
-    const maxSize = 3 * 1024 * 1024; // 3MB raw audio
+    // Railway can handle larger files - allow up to 50MB audio
+    const maxSize = 50 * 1024 * 1024; // 50MB
     console.log("File size check:", file.size, "vs max:", maxSize);
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 3MB for preview generation on Vercel.`, true);
+      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 50MB.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -571,11 +571,11 @@ imageInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Vercel request size is limited, so use smaller images for preview generation.
-    const maxSize = 1 * 1024 * 1024; // 1MB raw image
+    // Railway can handle larger files - allow up to 10MB images
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Image file too large (${sizeMB}MB). Please use files under 1MB for preview generation on Vercel.`, true);
+      setStatus(`Image file too large (${sizeMB}MB). Please use files under 10MB.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -707,14 +707,7 @@ renderButton.addEventListener("click", async () => {
     audioDataUrl: state.audioDataUrl,
     imageDataUrl: state.imageDataUrl,
   };
-  const payloadSize = JSON.stringify(payload).length;
-  const maxSize = 4.2 * 1024 * 1024; // ~4.2MB safe limit for Vercel functions
-
-  if (payloadSize > maxSize) {
-    const sizeMB = (payloadSize / (1024 * 1024)).toFixed(1);
-    setStatus(`Request body too large (${sizeMB}MB). Vercel serverless functions only accept payloads under about 4.5MB. Use smaller audio/image files or host the backend elsewhere.`, true);
-    return;
-  }
+  // Railway can handle larger payloads - no size limit needed
 
   stopPolling();
   state.activeJobId = null;
