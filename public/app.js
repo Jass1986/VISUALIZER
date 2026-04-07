@@ -537,12 +537,12 @@ audioInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Check file size (limit to 5MB to fit within Vercel payload limits)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Allow audio up to 100MB; actual upload may still be limited by serverless payload size.
+    const maxSize = 100 * 1024 * 1024; // 100MB
     console.log("File size check:", file.size, "vs max:", maxSize);
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 5MB.`, true);
+      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 100MB.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -712,7 +712,7 @@ renderButton.addEventListener("click", async () => {
 
   if (payloadSize > maxSize) {
     const sizeMB = (payloadSize / (1024 * 1024)).toFixed(1);
-    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 5MB each.`, true);
+    setStatus(`Request body too large (${sizeMB}MB). Vercel serverless functions only accept small payloads, so use smaller audio/image files.`, true);
     return;
   }
 
