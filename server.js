@@ -5,6 +5,8 @@ const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 const { spawn, spawnSync } = require("child_process");
+const FFMPEG_BINARY = process.env.FFMPEG_PATH || require("ffmpeg-static");
+const FFPROBE_BINARY = process.env.FFPROBE_PATH || require("ffprobe-static").path;
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -21,8 +23,8 @@ fs.mkdirSync(DATA_DIR, { recursive: true });
 // Check system dependencies at startup
 function checkSystemDependencies() {
   const dependencies = [
-    { name: 'ffmpeg', command: 'ffmpeg', args: ['-version'] },
-    { name: 'ffprobe', command: 'ffprobe', args: ['-version'] },
+    { name: 'ffmpeg', command: FFMPEG_BINARY, args: ['-version'] },
+    { name: 'ffprobe', command: FFPROBE_BINARY, args: ['-version'] },
     { name: 'python3', command: 'python3', args: ['--version'] }
   ];
 
@@ -31,7 +33,7 @@ function checkSystemDependencies() {
     try {
       const result = require('child_process').spawnSync(dep.command, dep.args, { encoding: 'utf8' });
       if (result.status === 0) {
-        console.log(`✅ ${dep.name} is available`);
+        console.log(`✅ ${dep.name} is available at ${dep.command}`);
       } else {
         console.log(`❌ ${dep.name} failed: ${result.stderr || result.stdout}`);
       }
@@ -824,7 +826,7 @@ function runCommand(command, args, onStdoutLine) {
 }
 
 async function getAudioDurationSeconds(filePath) {
-  const result = await runCommand("ffprobe", [
+  const result = await runCommand(FFPROBE_BINARY, [
     "-v",
     "error",
     "-show_entries",
@@ -1052,6 +1054,8 @@ async function renderJob(jobId) {
       recordStyleUsage(job.style);
       return;
     }
+
+    const graph = buildFilterGraph({
       style: job.style,
       formatKey: job.format,
       durationSeconds: renderDurationSeconds,
@@ -1103,7 +1107,7 @@ async function renderJob(jobId) {
     );
 
     await runCommand(
-      "ffmpeg",
+      FFMPEG_BINARY,
       ffmpegArgs,
       (line) => {
         if (!renderDurationSeconds || !line.startsWith("out_time_ms=")) {
