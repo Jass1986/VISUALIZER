@@ -1130,21 +1130,23 @@ async function handleCreateRender(req, res) {
     }
 
     const style = STYLE_PRESETS[payload.style] ? payload.style : "pulse";
-    const format = OUTPUT_FORMATS[payload.format] ? payload.format : "widescreen";
-    const clipMode = CLIP_MODES[payload.clipMode] ? payload.clipMode : "preview";
     
-    // Check if style requires Python and fall back if Python not available
-    let actualStyle = style;
+    // Check if style requires Python and reject if Python not available
     if (STYLE_PRESETS[style].engine === "python" && !RENDERER_PYTHON) {
-      const fallbackStyles = {
-        basswarp: "basscolumns",
-        prismring: "scope",
-        latticebars: "glass",
-        shockwave: "wave"
-      };
-      actualStyle = fallbackStyles[style] || "pulse";
+      sendJson(res, 400, { 
+        error: "This style requires Python which is not available on the server. Please choose a different style.",
+        availableFallbacks: {
+          basswarp: "basscolumns",
+          prismring: "scope", 
+          latticebars: "glass",
+          shockwave: "wave"
+        }
+      });
+      return;
     }
     
+    const format = OUTPUT_FORMATS[payload.format] ? payload.format : "widescreen";
+    const clipMode = CLIP_MODES[payload.clipMode] ? payload.clipMode : "preview";
     const id = randomId();
     const now = new Date().toISOString();
 
@@ -1153,8 +1155,8 @@ async function handleCreateRender(req, res) {
       status: "queued",
       progress: 0,
       message: "Queued for rendering...",
-      style: actualStyle,
-      styleName: STYLE_PRESETS[actualStyle].name,
+      style,
+      styleName: STYLE_PRESETS[style].name,
       format,
       formatName: OUTPUT_FORMATS[format].name,
       clipMode,
