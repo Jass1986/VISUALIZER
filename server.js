@@ -925,7 +925,7 @@ async function renderJob(jobId) {
 
     const audioFile = parseDataUrl(job.audioDataUrl);
     const imageFile = parseDataUrl(job.imageDataUrl);
-    const overlayFile = job.overlayDataUrl ? parseDataUrl(job.overlayDataUrl) : null;
+    const overlayFile = job.overlayDataUrl && job.overlayDataUrl.trim() ? parseDataUrl(job.overlayDataUrl) : null;
     const audioExt = extensionFromMime(audioFile.mimeType);
     const imageExt = extensionFromMime(imageFile.mimeType);
     const overlayExt = overlayFile ? extensionFromMime(overlayFile.mimeType) : "";
