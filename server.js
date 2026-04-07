@@ -1,4 +1,4 @@
-// Visualizer Studio Server - Railway Deployment v2
+// Visualizer Studio Server - Railway Deployment v3
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
