@@ -537,12 +537,12 @@ audioInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Check file size (limit to 3MB to fit within Vercel payload limits)
-    const maxSize = 3 * 1024 * 1024; // 3MB
+    // Check file size (limit to 5MB to fit within Vercel payload limits)
+    const maxSize = 5 * 1024 * 1024; // 5MB
     console.log("File size check:", file.size, "vs max:", maxSize);
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 3MB.`, true);
+      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 5MB.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -571,11 +571,11 @@ imageInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Check file size (limit to 3MB to fit within Vercel payload limits)
-    const maxSize = 3 * 1024 * 1024; // 3MB
+    // Check file size (limit to 5MB to fit within Vercel payload limits)
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Image file too large (${sizeMB}MB). Please use files under 3MB.`, true);
+      setStatus(`Image file too large (${sizeMB}MB). Please use files under 5MB.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -708,11 +708,11 @@ renderButton.addEventListener("click", async () => {
     imageDataUrl: state.imageDataUrl,
   };
   const payloadSize = JSON.stringify(payload).length;
-  const maxSize = 4.5 * 1024 * 1024; // 4.5MB limit to be safe
+  const maxSize = 6 * 1024 * 1024; // 6MB limit
 
   if (payloadSize > maxSize) {
     const sizeMB = (payloadSize / (1024 * 1024)).toFixed(1);
-    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 3MB each.`, true);
+    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 5MB each.`, true);
     return;
   }
 
