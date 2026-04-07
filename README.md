@@ -39,6 +39,46 @@ Then open:
 http://127.0.0.1:3000
 ```
 
+## Deploy to Vercel
+
+This app is configured to run as a full-stack application on Vercel with the backend API and frontend together.
+
+### Steps:
+
+1. **Push your code to GitHub** (if not already done):
+   ```bash
+   git add .
+   git commit -m "Add Vercel config for backend deployment"
+   git push
+   ```
+
+2. **Deploy using Vercel CLI**:
+   ```bash
+   npm install -g vercel
+   vercel
+   ```
+   
+   Or use the **Vercel Dashboard**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Select your GitHub repository
+   - Vercel will auto-detect the Node.js backend and deploy a serverless instance
+
+3. **Environment Variables** (optional for Vercel):
+   - `VISUALIZER_PYTHON`: Path to Python with Pillow for bass-reactive styles
+   
+4. **After deployment**:
+   - Your app will be available at `https://<your-project-name>.vercel.app`
+   - Both frontend and API endpoints will work at the same domain
+   - The frontend will automatically detect and use the backend for rendering
+
+### Notes:
+
+- The `vercel.json` file configures routing for both static files and API endpoints
+- Rendered videos are stored in the serverless function's `/tmp` directory (ephemeral)
+- For persistent storage of videos, configure a cloud storage provider (e.g., AWS S3, Cloudinary)
+- Jobs are kept in memory during execution only
+
 ## Notes
 
 - Rendering happens locally with the installed `ffmpeg` and `ffprobe` binaries.

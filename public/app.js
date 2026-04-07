@@ -272,7 +272,8 @@ async function loadTopStyles() {
   leaderboardStatus.textContent = "Loading community favorites...";
 
   try {
-    const response = await fetch("/api/styles/top");
+    const backendUrl = window.BACKEND_URL || "";
+    const response = await fetch(`${backendUrl}/api/styles/top`);
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.error || "Could not load top styles.");
@@ -485,7 +486,8 @@ async function buildTextOverlayDataUrl() {
 
 async function pollJob(jobId) {
   try {
-    const response = await fetch(`/api/render/${jobId}`);
+    const backendUrl = window.BACKEND_URL || "";
+    const response = await fetch(`${backendUrl}/api/render/${jobId}`);
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.error || "Could not fetch render status.");
@@ -499,10 +501,11 @@ async function pollJob(jobId) {
       stopPolling();
       renderButton.disabled = false;
       state.activeJobId = null;
-      videoPreview.src = job.videoUrl;
+      const backendUrl = window.BACKEND_URL || "";
+      videoPreview.src = backendUrl + job.videoUrl;
       videoPreview.classList.remove("hidden");
       videoPlaceholder.classList.add("hidden");
-      downloadLink.href = job.videoUrl;
+      downloadLink.href = backendUrl + job.videoUrl;
       downloadLink.download = `${(titleInput.value || "visualizer").trim().replace(/\s+/g, "-").toLowerCase()}-${job.clipMode}.mp4`;
       downloadLink.classList.remove("hidden");
       setStatus(`Video ready in ${job.formatName} with ${job.styleName} as a ${job.clipName}.`);
@@ -673,7 +676,8 @@ renderButton.addEventListener("click", async () => {
   setStatus("Starting background render...");
 
   try {
-    const response = await fetch("/api/render", {
+    const backendUrl = window.BACKEND_URL || "";
+    const response = await fetch(backendUrl + "/api/render", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

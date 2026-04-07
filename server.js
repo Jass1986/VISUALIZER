@@ -1225,6 +1225,18 @@ function serveStatic(req, res) {
 }
 
 const server = http.createServer(async (req, res) => {
+  // Add CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle OPTIONS preflight requests
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
   if (req.method === "POST" && req.url === "/api/render") {
     await handleCreateRender(req, res);
     return;
