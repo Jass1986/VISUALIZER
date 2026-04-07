@@ -529,6 +529,7 @@ async function pollJob(jobId) {
 
 audioInput.addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
+  console.log("Audio file selected:", file?.name, "Size:", file?.size);
   if (!file) {
     state.audioDataUrl = "";
     renderSetupSummary();
@@ -538,6 +539,7 @@ audioInput.addEventListener("change", async (event) => {
   try {
     // Check file size (limit to 3MB to fit within Vercel payload limits)
     const maxSize = 3 * 1024 * 1024; // 3MB
+    console.log("File size check:", file.size, "vs max:", maxSize);
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
       setStatus(`Audio file too large (${sizeMB}MB). Please use files under 3MB.`, true);
@@ -545,10 +547,13 @@ audioInput.addEventListener("change", async (event) => {
       return;
     }
 
+    console.log("Reading file as data URL...");
     state.audioDataUrl = await readFileAsDataUrl(file);
+    console.log("File loaded successfully, data URL length:", state.audioDataUrl.length);
     renderSetupSummary();
     setStatus(`Loaded audio: ${file.name}`);
   } catch (error) {
+    console.error("Error loading audio file:", error);
     setStatus(`Failed to load audio file: ${error.message}`, true);
     event.target.value = ""; // Clear the input
   }
