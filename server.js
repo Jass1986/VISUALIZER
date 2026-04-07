@@ -1225,10 +1225,11 @@ function serveStatic(req, res) {
 }
 
 const server = http.createServer(async (req, res) => {
-  // Add CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // Add CORS headers for Vercel frontend
+  res.setHeader("Access-Control-Allow-Origin", "https://visualizer-ochre-eight.vercel.app");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
   // Handle OPTIONS preflight requests
   if (req.method === "OPTIONS") {
