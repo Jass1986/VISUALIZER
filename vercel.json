@@ -26,8 +26,5 @@
       "src": "/",
       "dest": "/public/index.html"
     }
-  ],
-  "env": {
-    "VISUALIZER_PYTHON": "@visualizer_python"
-  }
+  ]
 }
