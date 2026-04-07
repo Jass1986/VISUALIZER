@@ -18,6 +18,29 @@ const jobs = new Map();
 fs.mkdirSync(TMP_DIR, { recursive: true });
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
+// Check system dependencies at startup
+function checkSystemDependencies() {
+  const dependencies = [
+    { name: 'ffmpeg', command: 'ffmpeg', args: ['-version'] },
+    { name: 'ffprobe', command: 'ffprobe', args: ['-version'] },
+    { name: 'python3', command: 'python3', args: ['--version'] }
+  ];
+
+  console.log('Checking system dependencies...');
+  for (const dep of dependencies) {
+    try {
+      const result = require('child_process').spawnSync(dep.command, dep.args, { encoding: 'utf8' });
+      if (result.status === 0) {
+        console.log(`✅ ${dep.name} is available`);
+      } else {
+        console.log(`❌ ${dep.name} failed: ${result.stderr || result.stdout}`);
+      }
+    } catch (error) {
+      console.log(`❌ ${dep.name} not found: ${error.message}`);
+    }
+  }
+}
+
 function resolveRendererPython() {
   const candidates = [
     process.env.VISUALIZER_PYTHON,
@@ -751,6 +774,7 @@ function extensionFromMime(mimeType) {
 }
 
 function runCommand(command, args, onStdoutLine) {
+  console.log(`Running command: ${command} ${args.join(' ')}`);
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: ROOT,
@@ -781,8 +805,14 @@ function runCommand(command, args, onStdoutLine) {
       stderr += chunk.toString();
     });
 
-    child.on("error", reject);
+    child.on("error", (error) => {
+      console.error(`Command failed: ${command} ${args.join(' ')}`);
+      console.error(`Error: ${error.message}`);
+      reject(error);
+    });
+
     child.on("close", (code) => {
+      console.log(`Command exited with code ${code}: ${command} ${args.join(' ')}`);
       if (code === 0) {
         resolve({ stdout, stderr });
         return;
@@ -1280,6 +1310,9 @@ const server = http.createServer(async (req, res) => {
 
   sendJson(res, 405, { error: "Method not allowed." });
 });
+
+// Check system dependencies before starting server
+checkSystemDependencies();
 
 server.listen(PORT, HOST, () => {
   console.log(`Visualizer Studio running at http://${HOST}:${PORT}`);
