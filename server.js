@@ -1234,7 +1234,19 @@ function serveStatic(req, res) {
 
 const server = http.createServer(async (req, res) => {
   // Add CORS headers for Vercel frontend
-  res.setHeader("Access-Control-Allow-Origin", "https://visualizer-ochre-eight.vercel.app");
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    "https://visualizer-ochre-eight.vercel.app",
+    "https://visualizer-git-main-jeetkalsi86-gmailcoms-projects.vercel.app"
+  ];
+
+  // Allow if origin is in allowed list or is a vercel.app domain
+  if (allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "https://visualizer-ochre-eight.vercel.app");
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
