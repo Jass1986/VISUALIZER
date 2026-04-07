@@ -964,70 +964,81 @@ async function renderJob(jobId) {
 
     if (stylePreset.engine === "python") {
       if (!RENDERER_PYTHON) {
-        throw new Error(
-          "No compatible Python with Pillow was found. Set VISUALIZER_PYTHON to a Python that can import PIL, or use a non-reactive style."
-        );
-      }
+        // Fall back to a similar FFmpeg-based style when Python isn't available
+        const fallbackStyles = {
+          basswarp: "basscolumns",
+          prismring: "scope",
+          latticebars: "glass",
+          shockwave: "wave"
+        };
+        const fallbackStyle = fallbackStyles[job.style] || "pulse";
+        job.style = fallbackStyle;
+        stylePreset = STYLE_PRESETS[fallbackStyle];
+        updateJob(jobId, {
+          style: fallbackStyle,
+          styleName: stylePreset.name,
+          message: `Python not available, using ${stylePreset.name} instead...`,
+        });
+      } else {
+        // Python is available, proceed with Python rendering
+        const pythonArgs = [
+          path.join(ROOT, "scripts", "render_reactive.py"),
+          "--audio",
+          audioPath,
+          "--image",
+          imagePath,
+          "--output",
+          outputPath,
+          "--style",
+          job.style,
+          "--width",
+          String(formatPreset.width),
+          "--height",
+          String(formatPreset.height),
+          "--fps",
+          "30",
+          "--duration",
+          String(renderDurationSeconds || 0),
+        ];
 
-      const pythonArgs = [
-        path.join(ROOT, "scripts", "render_reactive.py"),
-        "--audio",
-        audioPath,
-        "--image",
-        imagePath,
-        "--output",
-        outputPath,
-        "--style",
-        job.style,
-        "--width",
-        String(formatPreset.width),
-        "--height",
-        String(formatPreset.height),
-        "--fps",
-        "30",
-        "--duration",
-        String(renderDurationSeconds || 0),
-      ];
+        if (job.title) {
+          pythonArgs.push("--title", job.title);
+        }
 
-      if (job.title) {
-        pythonArgs.push("--title", job.title);
-      }
+        if (job.artist) {
+          pythonArgs.push("--artist", job.artist);
+        }
 
-      if (job.artist) {
-        pythonArgs.push("--artist", job.artist);
-      }
-
-      await runCommand(RENDERER_PYTHON, pythonArgs, (line) => {
-        if (line.startsWith("progress=")) {
-          const value = Number.parseInt(line.split("=")[1], 10);
-          if (Number.isFinite(value)) {
-            updateJob(jobId, {
-              progress: Math.max(12, Math.min(98, value)),
-              message: `Rendering ${Math.max(0, Math.min(100, value))}%`,
-            });
+        await runCommand(RENDERER_PYTHON, pythonArgs, (line) => {
+          if (line.startsWith("progress=")) {
+            const value = Number.parseInt(line.split("=")[1], 10);
+            if (Number.isFinite(value)) {
+              updateJob(jobId, {
+                progress: Math.max(12, Math.min(98, value)),
+                message: `Rendering ${Math.max(0, Math.min(100, value))}%`,
+              });
+            }
+            return;
           }
-          return;
-        }
 
-        if (line.startsWith("status=")) {
-          updateJob(jobId, { message: line.slice("status=".length) });
-        }
-      });
+          if (line.startsWith("status=")) {
+            updateJob(jobId, { message: line.slice("status=".length) });
+          }
+        });
 
-      updateJob(jobId, {
-        status: "completed",
-        progress: 100,
-        message: "Video ready.",
-        videoUrl: `/media/${path.basename(outputPath)}`,
-        audioDataUrl: undefined,
-        imageDataUrl: undefined,
-        overlayDataUrl: undefined,
-      });
-      recordStyleUsage(job.style);
-      return;
+        updateJob(jobId, {
+          status: "completed",
+          progress: 100,
+          message: "Video ready.",
+          videoUrl: `/media/${path.basename(outputPath)}`,
+          audioDataUrl: undefined,
+          imageDataUrl: undefined,
+          overlayDataUrl: undefined,
+        });
+        recordStyleUsage(job.style);
+        return;
+      }
     }
-
-    const graph = buildFilterGraph({
       style: job.style,
       formatKey: job.format,
       durationSeconds: renderDurationSeconds,
