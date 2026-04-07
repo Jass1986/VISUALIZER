@@ -963,81 +963,63 @@ async function renderJob(jobId) {
     });
 
     if (stylePreset.engine === "python") {
-      if (!RENDERER_PYTHON) {
-        // Fall back to a similar FFmpeg-based style when Python isn't available
-        const fallbackStyles = {
-          basswarp: "basscolumns",
-          prismring: "scope",
-          latticebars: "glass",
-          shockwave: "wave"
-        };
-        const fallbackStyle = fallbackStyles[job.style] || "pulse";
-        job.style = fallbackStyle;
-        stylePreset = STYLE_PRESETS[fallbackStyle];
-        updateJob(jobId, {
-          style: fallbackStyle,
-          styleName: stylePreset.name,
-          message: `Python not available, using ${stylePreset.name} instead...`,
-        });
-      } else {
-        // Python is available, proceed with Python rendering
-        const pythonArgs = [
-          path.join(ROOT, "scripts", "render_reactive.py"),
-          "--audio",
-          audioPath,
-          "--image",
-          imagePath,
-          "--output",
-          outputPath,
-          "--style",
-          job.style,
-          "--width",
-          String(formatPreset.width),
-          "--height",
-          String(formatPreset.height),
-          "--fps",
-          "30",
-          "--duration",
-          String(renderDurationSeconds || 0),
-        ];
+      // Python should be available since we fell back in handleCreateRender
+      const pythonArgs = [
+        path.join(ROOT, "scripts", "render_reactive.py"),
+        "--audio",
+        audioPath,
+        "--image",
+        imagePath,
+        "--output",
+        outputPath,
+        "--style",
+        job.style,
+        "--width",
+        String(formatPreset.width),
+        "--height",
+        String(formatPreset.height),
+        "--fps",
+        "30",
+        "--duration",
+        String(renderDurationSeconds || 0),
+      ];
 
-        if (job.title) {
-          pythonArgs.push("--title", job.title);
-        }
-
-        if (job.artist) {
-          pythonArgs.push("--artist", job.artist);
-        }
-
-        await runCommand(RENDERER_PYTHON, pythonArgs, (line) => {
-          if (line.startsWith("progress=")) {
-            const value = Number.parseInt(line.split("=")[1], 10);
-            if (Number.isFinite(value)) {
-              updateJob(jobId, {
-                progress: Math.max(12, Math.min(98, value)),
-                message: `Rendering ${Math.max(0, Math.min(100, value))}%`,
-              });
-            }
-            return;
-          }
-
-          if (line.startsWith("status=")) {
-            updateJob(jobId, { message: line.slice("status=".length) });
-          }
-        });
-
-        updateJob(jobId, {
-          status: "completed",
-          progress: 100,
-          message: "Video ready.",
-          videoUrl: `/media/${path.basename(outputPath)}`,
-          audioDataUrl: undefined,
-          imageDataUrl: undefined,
-          overlayDataUrl: undefined,
-        });
-        recordStyleUsage(job.style);
-        return;
+      if (job.title) {
+        pythonArgs.push("--title", job.title);
       }
+
+      if (job.artist) {
+        pythonArgs.push("--artist", job.artist);
+      }
+
+      await runCommand(RENDERER_PYTHON, pythonArgs, (line) => {
+        if (line.startsWith("progress=")) {
+          const value = Number.parseInt(line.split("=")[1], 10);
+          if (Number.isFinite(value)) {
+            updateJob(jobId, {
+              progress: Math.max(12, Math.min(98, value)),
+              message: `Rendering ${Math.max(0, Math.min(100, value))}%`,
+            });
+          }
+          return;
+        }
+
+        if (line.startsWith("status=")) {
+          updateJob(jobId, { message: line.slice("status=".length) });
+        }
+      });
+
+      updateJob(jobId, {
+        status: "completed",
+        progress: 100,
+        message: "Video ready.",
+        videoUrl: `/media/${path.basename(outputPath)}`,
+        audioDataUrl: undefined,
+        imageDataUrl: undefined,
+        overlayDataUrl: undefined,
+      });
+      recordStyleUsage(job.style);
+      return;
     }
       style: job.style,
       formatKey: job.format,
@@ -1150,6 +1132,19 @@ async function handleCreateRender(req, res) {
     const style = STYLE_PRESETS[payload.style] ? payload.style : "pulse";
     const format = OUTPUT_FORMATS[payload.format] ? payload.format : "widescreen";
     const clipMode = CLIP_MODES[payload.clipMode] ? payload.clipMode : "preview";
+    
+    // Check if style requires Python and fall back if Python not available
+    let actualStyle = style;
+    if (STYLE_PRESETS[style].engine === "python" && !RENDERER_PYTHON) {
+      const fallbackStyles = {
+        basswarp: "basscolumns",
+        prismring: "scope",
+        latticebars: "glass",
+        shockwave: "wave"
+      };
+      actualStyle = fallbackStyles[style] || "pulse";
+    }
+    
     const id = randomId();
     const now = new Date().toISOString();
 
@@ -1158,8 +1153,8 @@ async function handleCreateRender(req, res) {
       status: "queued",
       progress: 0,
       message: "Queued for rendering...",
-      style,
-      styleName: STYLE_PRESETS[style].name,
+      style: actualStyle,
+      styleName: STYLE_PRESETS[actualStyle].name,
       format,
       formatName: OUTPUT_FORMATS[format].name,
       clipMode,
