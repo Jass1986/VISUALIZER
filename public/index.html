@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualizer Studio</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="hero-brand-row">
+            <div class="hero-brand-badge">
+              <img class="hero-brand-logo" src="/kalsi-beats-logo.png" alt="Kalsi Beats logo" />
+              <div class="hero-brand-copy">
+                <p class="eyebrow">FREE COMMUNITY VISUALIZER BY KALSI BEATS</p>
+                <p class="hero-brand-note">Enjoy creating music visualizers for free</p>
+              </div>
+            </div>
+            <a class="hero-link" href="https://www.youtube.com/@KalsiBeats" target="_blank" rel="noreferrer">Check Out My YouTube Channel</a>
+          </div>
+          <h1>Build free music visualizers from one song and one image.</h1>
+          <p class="hero-text">
+            This is a free community visualizer from Kalsi Beats. If it helps your music, check out my remix channel on YouTube.
+            <strong>Subscribe as a note of thanks.</strong>
+          </p>
+        </div>
+        <div class="hero-visualizer" aria-hidden="true">
+          <div class="hero-screen">
+            <div class="hero-bars">
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+              <span class="hero-bar"></span>
+            </div>
+            <div class="hero-wave"></div>
+            <p class="hero-screen-label">FREE FOR PRODUCERS</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel leaderboard-panel">
+        <div class="leaderboard-head">
+          <div>
+            <p class="section-kicker">Community Picks</p>
+            <h2>Most Used Visualizers</h2>
+            <p class="leaderboard-copy">
+              Updated from real renders created by users. These are the top 5 visualizer styles people use the most.
+            </p>
+          </div>
+          <div id="leaderboardStatus" class="leaderboard-status">Loading community favorites...</div>
+        </div>
+        <div id="topStylesList" class="top-styles-list"></div>
+      </section>
+
+      <section class="panel workspace">
+        <div class="inputs">
+          <div class="setup-strip">
+            <div id="audioReadyBadge" class="setup-pill">1. Add audio</div>
+            <div id="imageReadyBadge" class="setup-pill">2. Add artwork</div>
+            <div id="styleReadyBadge" class="setup-pill">3. Pick a style</div>
+            <div id="outputReadyBadge" class="setup-pill">4. Export settings</div>
+          </div>
+
+          <section class="step-card" data-step-card>
+            <button class="step-toggle" type="button" data-step-toggle aria-expanded="false">
+              <div class="step-head">
+                <div>
+                  <p class="step-label">Step 1</p>
+                  <h2>Load your track and cover art</h2>
+                </div>
+                <div class="step-toggle-side">
+                  <p class="step-note">Start here. Once both files are loaded, the rest of the setup becomes much easier to judge.</p>
+                  <span class="step-chevron">+</span>
+                </div>
+              </div>
+            </button>
+
+            <div class="step-body is-collapsed" data-step-body>
+              <div class="field dual-inputs">
+                <label>
+                  <span>Audio file</span>
+                  <input id="audioInput" type="file" accept="audio/*" />
+                </label>
+                <label>
+                  <span>Artwork image</span>
+                  <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" />
+                </label>
+              </div>
+
+              <div class="field dual-inputs">
+                <label>
+                  <span>Track title</span>
+                  <input id="titleInput" type="text" maxlength="80" placeholder="Midnight Drive" />
+                </label>
+                <label>
+                  <span>Artist name</span>
+                  <input id="artistInput" type="text" maxlength="80" placeholder="Kalsi Beats" />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="step-card" data-step-card>
+            <button class="step-toggle" type="button" data-step-toggle aria-expanded="false">
+              <div class="step-head">
+                <div>
+                  <p class="step-label">Step 2</p>
+                  <h2>Frame the image before you render</h2>
+                </div>
+                <div class="step-toggle-side">
+                  <p class="step-note">Use these controls to crop and balance the artwork so it fits the screen cleanly.</p>
+                  <span class="step-chevron">+</span>
+                </div>
+              </div>
+            </button>
+
+            <div class="step-body is-collapsed" data-step-body>
+              <div class="field">
+                <div class="field-header">
+                  <span>Image adjustments</span>
+                  <button id="resetImageEditsButton" class="secondary-button" type="button">Reset edits</button>
+                </div>
+                <div class="edit-grid">
+                  <label>
+                    <span>Brightness</span>
+                    <input id="brightnessInput" type="range" min="50" max="150" value="100" />
+                  </label>
+                  <label>
+                    <span>Contrast</span>
+                    <input id="contrastInput" type="range" min="50" max="150" value="100" />
+                  </label>
+                  <label>
+                    <span>Saturation</span>
+                    <input id="saturationInput" type="range" min="0" max="180" value="100" />
+                  </label>
+                  <label>
+                    <span>Zoom</span>
+                    <input id="zoomInput" type="range" min="100" max="170" value="100" />
+                  </label>
+                  <label>
+                    <span>Horizontal</span>
+                    <input id="offsetXInput" type="range" min="-100" max="100" value="0" />
+                  </label>
+                  <label>
+                    <span>Vertical</span>
+                    <input id="offsetYInput" type="range" min="-100" max="100" value="0" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="step-card" data-step-card>
+            <button class="step-toggle" type="button" data-step-toggle aria-expanded="false">
+              <div class="step-head">
+                <div>
+                  <p class="step-label">Step 3</p>
+                  <h2>Choose a visual style and render</h2>
+                </div>
+                <div class="step-toggle-side">
+                  <strong id="styleCount">0 styles</strong>
+                  <span class="step-chevron">+</span>
+                </div>
+              </div>
+            </button>
+
+            <div class="step-body is-collapsed" data-step-body>
+              <div class="field dual-inputs">
+                <label>
+                  <span>Category</span>
+                  <select id="styleCategorySelect"></select>
+                </label>
+                <label>
+                  <span>Style</span>
+                  <select id="styleSelect"></select>
+                </label>
+              </div>
+
+              <div class="style-hero-card">
+                <div id="styleHeroPreview" class="style-preview"></div>
+                <div class="style-hero-copy">
+                  <p id="styleHeroMeta" class="style-hero-meta"></p>
+                  <h3 id="styleHeroName"></h3>
+                  <p id="styleHeroDescription"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <p class="section-help">Use previous and next to browse styles in the selected category. The preview above always shows only the current choice.</p>
+                <div class="style-browser-toolbar">
+                  <span id="stylePageInfo" class="style-page-info">Selected style</span>
+                  <div class="style-pager">
+                    <button id="stylePrevButton" class="secondary-button" type="button">Previous</button>
+                    <button id="styleNextButton" class="secondary-button" type="button">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-divider"></div>
+
+              <div class="step-head compact-step-head">
+                <div>
+                  <p class="step-label">Render Settings</p>
+                  <h2>Export without leaving this section</h2>
+                </div>
+                <p id="setupSummary" class="step-note">Choose the output size and render length, then start the render.</p>
+              </div>
+
+              <div class="field">
+                <span>Video format</span>
+                <div id="formatGrid" class="format-grid"></div>
+              </div>
+
+              <div class="field">
+                <span>Render length</span>
+                <div id="clipGrid" class="clip-grid"></div>
+              </div>
+
+              <div class="render-actions">
+                <button id="renderButton" class="primary-button" type="button">Start Render</button>
+                <p id="status" class="status">Choose your files, category, style, size, and preview mode to begin.</p>
+              </div>
+
+              <div id="jobPanel" class="job-panel hidden">
+                <div class="job-header">
+                  <strong>Render Progress</strong>
+                  <span id="jobPercent">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="jobMessage" class="job-message">Waiting to start...</p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="preview-column">
+          <div class="preview-stage">
+            <div class="preview-card">
+              <div class="preview-head">
+                <p class="preview-label">Artwork Preview</p>
+                <span id="selectionHint" class="preview-hint">This is the edited image that will be rendered.</span>
+              </div>
+              <img id="imagePreview" class="image-preview hidden" alt="Artwork preview" />
+              <div id="imagePlaceholder" class="placeholder">Your artwork preview will show up here.</div>
+            </div>
+
+            <div class="preview-card">
+              <div class="preview-head">
+                <p class="preview-label">Rendered Video</p>
+                <span class="preview-hint">Preview the finished MP4 here when the job completes.</span>
+              </div>
+              <video id="videoPreview" class="video-preview hidden" controls></video>
+              <div id="videoPlaceholder" class="placeholder">
+                Long renders stay in the background while progress updates here.
+              </div>
+              <a id="downloadLink" class="download-link hidden" download="visualizer.mp4">Download MP4</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel feedback-section">
+        <div class="feedback-header">
+          <div>
+            <p class="eyebrow">COMMUNITY FEEDBACK</p>
+            <h2>Built free for music producers. Share what should improve next.</h2>
+          </div>
+          <p class="feedback-copy">Leave feedback, feature ideas, or visualizer requests. Comments are saved in this browser so you can keep a running feedback wall while testing the site.</p>
+        </div>
+
+        <div class="feedback-grid">
+          <form id="commentForm" class="feedback-form">
+            <label class="field">
+              <span>Name</span>
+              <input id="commentNameInput" type="text" maxlength="60" placeholder="Producer name" />
+            </label>
+
+            <label class="field">
+              <span>Role</span>
+              <input id="commentRoleInput" type="text" maxlength="60" placeholder="Beatmaker / Artist / Producer" />
+            </label>
+
+            <label class="field">
+              <span>Feedback</span>
+              <textarea id="commentMessageInput" rows="5" maxlength="320" placeholder="What should be added, improved, or refined next?"></textarea>
+            </label>
+
+            <div class="feedback-actions">
+              <button class="primary-button" type="submit">Post Feedback</button>
+              <p id="commentStatus" class="status">Share ideas for new visualizers, export options, or workflow improvements.</p>
+            </div>
+          </form>
+
+          <div class="feedback-wall">
+            <div class="feedback-wall-head">
+              <strong>Feedback Wall</strong>
+              <button id="clearCommentsButton" class="secondary-button" type="button">Clear Saved</button>
+            </div>
+            <div id="commentsList" class="comments-list"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

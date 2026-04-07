@@ -1,0 +1,9 @@
+{
+  "name": "visualizer-studio",
+  "version": "1.0.0",
+  "description": "Local music visualizer app that turns audio and artwork into MP4 videos.",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}
