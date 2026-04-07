@@ -20,11 +20,10 @@ fs.mkdirSync(DATA_DIR, { recursive: true });
 function resolveRendererPython() {
   const candidates = [
     process.env.VISUALIZER_PYTHON,
-    "/opt/homebrew/Caskroom/miniconda/base/bin/python3",
-    "/opt/homebrew/bin/python3",
-    "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+    "/usr/bin/python3",
     "/usr/local/bin/python3",
     "python3",
+    "python",
   ].filter(Boolean);
 
   for (const candidate of candidates) {
