@@ -1133,7 +1133,7 @@ async function handleCreateRender(req, res) {
     const style = STYLE_PRESETS[payload.style] ? payload.style : "pulse";
     
     // Check if style requires Python and reject if Python not available
-    if (STYLE_PRESETS[style].engine === "python") {
+    if (STYLE_PRESETS[style].engine === "python" && !RENDERER_PYTHON) {
       sendJson(res, 400, { 
         error: "This style requires Python which is not available on the server. Please choose a different style.",
         availableFallbacks: {
