@@ -535,18 +535,23 @@ audioInput.addEventListener("change", async (event) => {
     return;
   }
 
-  // Check file size (limit to 2MB to fit within Vercel payload limits)
-  const maxSize = 2 * 1024 * 1024; // 2MB
-  if (file.size > maxSize) {
-    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-    setStatus(`Audio file too large (${sizeMB}MB). Please use files under 2MB.`, true);
-    event.target.value = ""; // Clear the input
-    return;
-  }
+  try {
+    // Check file size (limit to 3MB to fit within Vercel payload limits)
+    const maxSize = 3 * 1024 * 1024; // 3MB
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 3MB.`, true);
+      event.target.value = ""; // Clear the input
+      return;
+    }
 
-  state.audioDataUrl = await readFileAsDataUrl(file);
-  renderSetupSummary();
-  setStatus(`Loaded audio: ${file.name}`);
+    state.audioDataUrl = await readFileAsDataUrl(file);
+    renderSetupSummary();
+    setStatus(`Loaded audio: ${file.name}`);
+  } catch (error) {
+    setStatus(`Failed to load audio file: ${error.message}`, true);
+    event.target.value = ""; // Clear the input
+  }
 });
 
 imageInput.addEventListener("change", async (event) => {
@@ -560,21 +565,26 @@ imageInput.addEventListener("change", async (event) => {
     return;
   }
 
-  // Check file size (limit to 2MB to fit within Vercel payload limits)
-  const maxSize = 2 * 1024 * 1024; // 2MB
-  if (file.size > maxSize) {
-    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-    setStatus(`Image file too large (${sizeMB}MB). Please use files under 2MB.`, true);
-    event.target.value = ""; // Clear the input
-    return;
-  }
+  try {
+    // Check file size (limit to 3MB to fit within Vercel payload limits)
+    const maxSize = 3 * 1024 * 1024; // 3MB
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      setStatus(`Image file too large (${sizeMB}MB). Please use files under 3MB.`, true);
+      event.target.value = ""; // Clear the input
+      return;
+    }
 
-  state.sourceImageDataUrl = await readFileAsDataUrl(file);
-  state.imageAdjustments = { ...defaultImageAdjustments };
-  syncImageControls();
-  await applyImageAdjustments();
-  renderSetupSummary();
-  setStatus(`Loaded artwork: ${file.name}`);
+    state.sourceImageDataUrl = await readFileAsDataUrl(file);
+    state.imageAdjustments = { ...defaultImageAdjustments };
+    syncImageControls();
+    await applyImageAdjustments();
+    renderSetupSummary();
+    setStatus(`Loaded artwork: ${file.name}`);
+  } catch (error) {
+    setStatus(`Failed to load image file: ${error.message}`, true);
+    event.target.value = ""; // Clear the input
+  }
 });
 
 styleCategorySelect.addEventListener("change", (event) => {
@@ -693,11 +703,11 @@ renderButton.addEventListener("click", async () => {
     imageDataUrl: state.imageDataUrl,
   };
   const payloadSize = JSON.stringify(payload).length;
-  const maxSize = 3.5 * 1024 * 1024; // 3.5MB limit to be safe
+  const maxSize = 4.5 * 1024 * 1024; // 4.5MB limit to be safe
 
   if (payloadSize > maxSize) {
     const sizeMB = (payloadSize / (1024 * 1024)).toFixed(1);
-    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 2MB each.`, true);
+    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 3MB each.`, true);
     return;
   }
 
