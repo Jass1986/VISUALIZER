@@ -36,10 +36,10 @@ const styles = [
   { id: "basscolumns", name: "Bass Columns", description: "Heavy glowing columns that jump from the bottom with a cleaner club-style low-end feel.", category: "bass_reactive", motif: "bars", theme: "cyan" },
   { id: "subsurge", name: "Sub Surge", description: "Wide bass bands surge upward with a deep sub-driven club look.", category: "bass_reactive", motif: "bands", theme: "cyan" },
   { id: "kickstrobe", name: "Kick Strobe", description: "Sharp kick-style columns with a tight center line for more aggressive beat energy.", category: "bass_reactive", motif: "top-bars", theme: "magenta" },
-  { id: "basswarp", name: "Bass Warp", description: "Bass-reactive image vibration with neon mirrored bars and center pulse.", category: "bass_reactive", motif: "ring-bars", theme: "cyan" },
-  { id: "prismring", name: "Prism Ring", description: "Bass-reactive artwork with radial prism spokes and a reactive halo ring.", category: "bass_reactive", motif: "ring", theme: "rainbow" },
-  { id: "latticebars", name: "Lattice Bars", description: "Futuristic glass bar stacks with image shake driven by low-end hits.", category: "bass_reactive", motif: "panel-bars", theme: "ice" },
-  { id: "shockwave", name: "Shockwave", description: "Heavy bass pulses drive ripple waves through the full-screen artwork.", category: "bass_reactive", motif: "shockwave", theme: "cyan" },
+  { id: "basswarp", name: "Bass Warp", description: "Bass-reactive image vibration with neon mirrored bars and center pulse.", category: "bass_reactive", motif: "ring-bars", theme: "cyan", engine: "python" },
+  { id: "prismring", name: "Prism Ring", description: "Bass-reactive artwork with radial prism spokes and a reactive halo ring.", category: "bass_reactive", motif: "ring", theme: "rainbow", engine: "python" },
+  { id: "latticebars", name: "Lattice Bars", description: "Futuristic glass bar stacks with image shake driven by low-end hits.", category: "bass_reactive", motif: "panel-bars", theme: "ice", engine: "python" },
+  { id: "shockwave", name: "Shockwave", description: "Heavy bass pulses drive ripple waves through the full-screen artwork.", category: "bass_reactive", motif: "shockwave", theme: "cyan", engine: "python" },
 ];
 
 const formats = [
@@ -226,9 +226,13 @@ function renderStyleOptions() {
   for (const style of visibleStyles) {
     const option = document.createElement("option");
     option.value = style.id;
-    option.textContent = style.name;
+    option.textContent = style.name + (style.engine === "python" ? " (Python required - may not work)" : "");
     if (style.id === state.selectedStyle) {
       option.selected = true;
+    }
+    if (style.engine === "python") {
+      option.disabled = true;
+      option.style.color = "#999";
     }
     styleSelect.appendChild(option);
   }
@@ -693,6 +697,13 @@ clearCommentsButton.addEventListener("click", () => {
 renderButton.addEventListener("click", async () => {
   if (!state.audioDataUrl || !state.imageDataUrl) {
     setStatus("Please choose both an audio file and an image.", true);
+    return;
+  }
+
+  // Check if selected style requires Python
+  const selectedStyle = styles.find(s => s.id === state.selectedStyle);
+  if (selectedStyle && selectedStyle.engine === "python") {
+    setStatus("This style requires Python which is not available. Please choose a different style like 'Bass Columns', 'Stereo Scope', 'Glass Bars', or 'Neon Wave'.", true);
     return;
   }
 
