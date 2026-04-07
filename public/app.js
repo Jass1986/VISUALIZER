@@ -537,12 +537,12 @@ audioInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Allow audio selection up to 100MB in the browser.
-    const maxSize = 100 * 1024 * 1024; // 100MB
+    // Vercel request size is limited, so use smaller audio files for preview generation.
+    const maxSize = 3 * 1024 * 1024; // 3MB raw audio
     console.log("File size check:", file.size, "vs max:", maxSize);
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 100MB.`, true);
+      setStatus(`Audio file too large (${sizeMB}MB). Please use files under 3MB for preview generation on Vercel.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
@@ -571,11 +571,11 @@ imageInput.addEventListener("change", async (event) => {
   }
 
   try {
-    // Allow image selection up to 25MB in the browser.
-    const maxSize = 25 * 1024 * 1024; // 25MB
+    // Vercel request size is limited, so use smaller images for preview generation.
+    const maxSize = 1 * 1024 * 1024; // 1MB raw image
     if (file.size > maxSize) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setStatus(`Image file too large (${sizeMB}MB). Please use files under 25MB.`, true);
+      setStatus(`Image file too large (${sizeMB}MB). Please use files under 1MB for preview generation on Vercel.`, true);
       event.target.value = ""; // Clear the input
       return;
     }
