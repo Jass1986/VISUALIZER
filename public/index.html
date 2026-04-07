@@ -317,11 +317,8 @@
 
     <script>
       // Set backend URL for API calls
-      // In production on Vercel, this should point to your backend deployment
-      // For local development, leave empty to use relative URLs (localhost:3000)
-      window.BACKEND_URL = window.location.hostname === 'localhost' 
-        ? '' 
-        : (window.location.origin);
+      // Railway backend for handling large file uploads
+      window.BACKEND_URL = "https://visualizer-production-5fb8.up.railway.app";
     </script>
     <script src="/app.js"></script>
   </body>
