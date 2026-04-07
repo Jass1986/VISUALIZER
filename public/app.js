@@ -535,6 +535,15 @@ audioInput.addEventListener("change", async (event) => {
     return;
   }
 
+  // Check file size (limit to 2MB to fit within Vercel payload limits)
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  if (file.size > maxSize) {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    setStatus(`Audio file too large (${sizeMB}MB). Please use files under 2MB.`, true);
+    event.target.value = ""; // Clear the input
+    return;
+  }
+
   state.audioDataUrl = await readFileAsDataUrl(file);
   renderSetupSummary();
   setStatus(`Loaded audio: ${file.name}`);
@@ -548,6 +557,15 @@ imageInput.addEventListener("change", async (event) => {
     imagePreview.classList.add("hidden");
     imagePlaceholder.classList.remove("hidden");
     renderSetupSummary();
+    return;
+  }
+
+  // Check file size (limit to 2MB to fit within Vercel payload limits)
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  if (file.size > maxSize) {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    setStatus(`Image file too large (${sizeMB}MB). Please use files under 2MB.`, true);
+    event.target.value = ""; // Clear the input
     return;
   }
 
@@ -663,6 +681,26 @@ renderButton.addEventListener("click", async () => {
     return;
   }
 
+  // Check payload size (Vercel has ~5MB limit for serverless functions)
+  const payload = {
+    style: state.selectedStyle,
+    format: state.selectedFormat,
+    clipMode: state.selectedClipMode,
+    title: titleInput.value.trim(),
+    artist: artistInput.value.trim(),
+    overlayDataUrl: await buildTextOverlayDataUrl(),
+    audioDataUrl: state.audioDataUrl,
+    imageDataUrl: state.imageDataUrl,
+  };
+  const payloadSize = JSON.stringify(payload).length;
+  const maxSize = 3.5 * 1024 * 1024; // 3.5MB limit to be safe
+
+  if (payloadSize > maxSize) {
+    const sizeMB = (payloadSize / (1024 * 1024)).toFixed(1);
+    setStatus(`Files too large (${sizeMB}MB). Try smaller audio/image files under 2MB each.`, true);
+    return;
+  }
+
   stopPolling();
   state.activeJobId = null;
   renderButton.disabled = true;
@@ -680,16 +718,7 @@ renderButton.addEventListener("click", async () => {
     const response = await fetch(backendUrl + "/api/render", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        style: state.selectedStyle,
-        format: state.selectedFormat,
-        clipMode: state.selectedClipMode,
-        title: titleInput.value.trim(),
-        artist: artistInput.value.trim(),
-        overlayDataUrl: await buildTextOverlayDataUrl(),
-        audioDataUrl: state.audioDataUrl,
-        imageDataUrl: state.imageDataUrl,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const result = await response.json();
