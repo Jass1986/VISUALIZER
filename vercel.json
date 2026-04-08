@@ -2,7 +2,8 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "buildCommand": "apt-get update && apt-get install -y python3 python3-pip && pip3 install Pillow"
     },
     {
       "src": "public/**",
